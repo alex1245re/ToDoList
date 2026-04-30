@@ -10,6 +10,7 @@ const auth = getAuth();
 const errores = ref('');
 const email = ref('');
 const password = ref('');
+const showPassword = ref(false);
 
 function crearDatosUsuario(user) {
     return {
@@ -65,6 +66,10 @@ function crearUsuario(){
     });
 }
 
+function toggleShowPassword(){
+    showPassword.value = !showPassword.value;
+}
+
 </script>
 
 <template>
@@ -86,15 +91,29 @@ function crearUsuario(){
                     @keyup.enter="iniciarSesion"
                 />
             </div>
-            <div class="form-group">
+            <div class="form-group password-field">
                 <label class="form-label">Contraseña</label>
-                <input
-                    class="form-input"
-                    type="password"
-                    placeholder="••••••••"
-                    v-model="password"
-                    @keyup.enter="iniciarSesion"
-                />
+                <div class="input-with-button">
+                    <input
+                        class="form-input inner-input"
+                        :type="showPassword ? 'text' : 'password'"
+                        placeholder="••••••••"
+                        v-model="password"
+                        @keyup.enter="iniciarSesion"
+                    />
+                    <button type="button" class="password-toggle" @click="toggleShowPassword" :aria-pressed="showPassword" aria-label="Mostrar contraseña">
+                        <svg v-if="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M12 5c-7 0-11 6-11 7s4 7 11 7 11-6 11-7-4-7-11-7z" stroke="#cbd5e1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="#cbd5e1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M3 3l18 18" stroke="#cbd5e1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10.58 10.58A3 3 0 0013.42 13.42" stroke="#cbd5e1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9.88 5.05a16.94 16.94 0 011.67-.05c7 0 11 6 11 7 0 .55-.53 1.75-1.5 2.85" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.2 6.2A16.94 16.94 0 004 12c0 .55.53 1.75 1.5 2.85" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <p v-if="errores" class="msg-error">{{ errores }}</p>
@@ -184,6 +203,39 @@ function crearUsuario(){
 .form-group {
     margin-bottom: 18px;
 }
+
+.password-field { position: relative; }
+.input-with-button {
+    display: flex;
+    align-items: center;
+    background: #262a35;
+    border: 1px solid #3a3f4b;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.input-with-button .inner-input {
+    border: 0;
+    background: transparent;
+    padding: 13px 12px;
+    font-size: 16px;
+    color: #f0f4f8;
+    outline: none;
+    flex: 1 1 auto;
+}
+.password-toggle {
+    background: transparent;
+    border: none;
+    padding: 8px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #c8cdd8;
+    width: 48px;
+    height: 48px;
+}
+.password-toggle svg { display: block; }
+.password-toggle:focus { outline: 2px solid rgba(16,185,129,0.18); border-radius: 8px; }
 
 .form-label {
     display: block;
