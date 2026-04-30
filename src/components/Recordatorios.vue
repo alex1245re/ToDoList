@@ -19,13 +19,12 @@ const item = ref('');
 const nuevaPrioridad = ref('Normal');
 const listaTareas = ref([]);
 const prioridadAnimando = ref({});
-const urlArchivoTemporal = ref('');
-const archivoSeleccionado = ref(null);
+const archivosSeleccionados = ref([]);
 const fileInput = ref(null);
 const subiendo = ref(false);
 
 function capturarArchivo(e) {
-    archivoSeleccionado.value = e.target.files[0];
+    archivosSeleccionados.value = Array.from(e.target.files);
 }
 
 const consultaItems = query(
@@ -55,7 +54,6 @@ const listaOrdenada = computed(() => {
 
 const totalTareas = computed(() => listaTareas.value.length);
 const tareasRestantes = computed(() => listaTareas.value.filter((tarea) => !tarea.completado).length);
-const tareasCompletadas = computed(() => listaTareas.value.filter((tarea) => tarea.completado).length);
 
 async function cargarTareas() {
         const recordatorios = esAdmin.value ? collection(db, collectionName) : consultaItems;
@@ -73,16 +71,28 @@ onMounted(() => {
 async function agregarItem() {
     if (item.value.trim() != ''){
         subiendo.value = true;
-        
-        if (archivoSeleccionado.value) {
-            const nombreUnico = `${Date.now()}_${archivoSeleccionado.value.name}`;
-            const { error } = await supabase.storage.from('AdjuntosRecordatorios').upload(nombreUnico, archivoSeleccionado.value);
+        let listaSubidos = [];
 
-            if (!error) {
-                const { data } = supabase.storage.from('AdjuntosRecordatorios').getPublicUrl(nombreUnico);
-                urlArchivoTemporal.value = data.publicUrl;
+        if (archivosSeleccionados.value && archivosSeleccionados.value.length > 0) {
+            for(const archivo of archivosSeleccionados.value) {
+                const nombreUnico = `${Date.now()}_${archivo.name}`;
+
+                const { error } = await supabase.storage.from('AdjuntosRecordatorios').upload(nombreUnico, archivo);
+
+                if (!error) {
+                    const { data } = supabase.storage.from('AdjuntosRecordatorios').getPublicUrl(nombreUnico);
+
+                    listaSubidos.push({
+                        nombreReal: archivo.name,
+                        archivoNombre: nombreUnico,
+                        archivoUrl: data.publicUrl
+                    });
+                } else {
+                    console.error('Error al subir el archivo:', error);
+                }
             }
         }
+
         await addDoc(collection(db, collectionName), {
             nombre: item.value,
             completado: false,
@@ -90,15 +100,16 @@ async function agregarItem() {
             usuarioId: props.usuario.uid,
             prioridad: nuevaPrioridad.value,
             nombreAutor: props.usuario.nombre,
-            archivoUrl: urlArchivoTemporal.value
+            archivos: listaSubidos,
         });
+
         item.value = '';
         nuevaPrioridad.value = 'Normal';
-        archivoSeleccionado.value = null;
+        archivosSeleccionados.value = [];
         if (fileInput.value) {
             fileInput.value.value = '';
         }
-        urlArchivoTemporal.value = '';
+
         subiendo.value = false;
         await cargarTareas();
     }
@@ -115,6 +126,12 @@ async function borrarCompletadas() {
 }
 
 async function eliminarItem(elemento) {
+    if (elemento.archivos && elemento.archivos.length > 0) {
+        const nombresBorrar =elemento.archivos.map((archivo) => archivo.archivoNombre);
+        const error = await supabase.storage.from('AdjuntosRecordatorios').remove(nombresBorrar);
+
+        if (error) console.log("Error al borrar de Supabase:", error);
+    }
     await deleteDoc(doc(db, collectionName, elemento.id));
     await cargarTareas();
 }
@@ -184,7 +201,7 @@ async function cerrarSesion() {
             </div>
 
             <label class="file-upload" :class="{ disabled: subiendo }">
-                <input type="file" ref="fileInput" @change="capturarArchivo" :disabled="subiendo">
+                <input type="file" ref="fileInput" @change="capturarArchivo" :disabled="subiendo" multiple>
                 <span class="file-button">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4" stroke="#06202a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -192,7 +209,9 @@ async function cerrarSesion() {
                     </svg>
                     <span>Adjuntar</span>
                 </span>
-                <span class="file-name" v-if="archivoSeleccionado">{{ archivoSeleccionado.name }}</span>
+                <span class="file-name" v-if="archivosSeleccionados && archivosSeleccionados.length > 0">
+                    {{ archivosSeleccionados.map(archivo => archivo.name).join(', ') }}
+                </span>
             </label>
 
             <button class="add-button" @click="agregarItem" :disabled="subiendo">
@@ -214,7 +233,18 @@ async function cerrarSesion() {
                 class="task-item"
                 :class="{ completed: elemento.completado, 'priority-flash': prioridadAnimando[elemento.id] }"
             >
-            <a v-if="elemento.archivoUrl" class="archivo-link" :href="elemento.archivoUrl" target="_blank" rel="noopener">Ver archivo</a>
+            <template v-if="elemento.archivos && elemento.archivos.length">
+                <a
+                    v-for="(archivo, index) in elemento.archivos"
+                    :key="index"
+                    class="archivo-link"
+                    :href="archivo.archivoUrl"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    {{ archivo.nombreReal }}
+                </a>
+            </template>
                 <div class="task-left">
                     <label class="checkbox">
                         <input

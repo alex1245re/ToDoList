@@ -3,7 +3,6 @@ import App from './App.vue'
 import { initializeApp } from "firebase/app"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { VueFire } from 'vuefire'
-import SupabaseStorage from "./components/SupabaseStorage.vue";
 import { createRouter, createWebHistory } from 'vue-router'
 import Recordatorios from './components/Recordatorios.vue'
 import InicioSesion from './components/InicioSesion.vue'    
