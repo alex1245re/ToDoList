@@ -1,38 +1,31 @@
-# toDoList
+# ToDoList — Aplicación de Recordatorios
 
-This template should help get you started developing with Vue 3 in Vite.
+![Vue 3](https://img.shields.io/badge/Vue-3.x-42b883?style=for-the-badge&logo=vuejs&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
-## Recommended IDE Setup
+> Tu gestor de recordatorios moderno. Crea, organiza y adjunta archivos a tus recordatorios con prioridad y control básico de administración.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## ✨ Características principales
 
-## Recommended Browser Setup
+- ✅ CRUD completo: crear, editar, completar y eliminar recordatorios.
+- 🔝 Prioridades ordenadas: High → Normal → Low (ordenamiento automático).
+- 📎 Adjuntos con Supabase Storage: sube archivos y agrega un enlace público.
+- 👥 Vista de administrador: (opcional) ver todos los registros desde la interfaz.
+- 🔒 Autenticación con Firebase Auth.
+- ♿ UI accesible y responsive, con experiencia optimizada para mobile y desktop.
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## 🛠️ Tecnologías usadas
 
-## Customize configuration
+| Tecnología | Uso |
+| :--- | :--- |
+| **Vue 3** | Frontend (Composition API, `script setup`) |
+| **Firebase Auth** | Autenticación de usuarios |
+| **Firestore** | Base de datos en tiempo real para recordatorios |
+| **Supabase Storage** | Almacenamiento de archivos adjuntos |
+| **Vite** | Bundler rápido para desarrollo y build |
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## 🚀 Demo
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+- Sitio desplegado: https://todolist-7d0d2.web.app
